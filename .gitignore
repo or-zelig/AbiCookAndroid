@@ -1,0 +1,36 @@
+# Gradle files
+.gradle/
+build/
+**/build/
+
+# Local configuration
+local.properties
+
+# Android Studio
+.idea/
+*.iml
+
+# Logs
+*.log
+
+# Generated files
+captures/
+output.json
+
+# Firebase keys (DO NOT COMMIT!)
+google-services.json
+
+# Keystore files
+*.jks
+*.keystore
+
+# Release APKs
+*.apk
+*.aab
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Kotlin/Java
+*.class
