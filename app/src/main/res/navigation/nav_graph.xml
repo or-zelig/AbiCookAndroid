@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <!-- GLOBAL ACTION -->
+    <action
+        android:id="@+id/action_global_createRecipeFragment"
+        app:destination="@id/createRecipeFragment" />
+    <action
+        android:id="@+id/action_global_recipeDetailsFragment"
+        app:destination="@id/recipeDetailsFragment" />
+    <action
+        android:id="@+id/action_global_createRecipeWizard"
+        app:destination="@id/createRecipeBasicInfoFragment" />
+
+
+    <!-- LOGIN ACTION -->
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="il.co.or.abicook.presentation.auth.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_signUpFragment"
+            app:destination="@id/signUpFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_homeFeedFragment"
+            app:destination="@id/homeFeedFragment" />
+    </fragment>
+
+    <!-- HOME ACTION -->
+    <fragment
+        android:id="@+id/homeFeedFragment"
+        android:name="il.co.or.abicook.presentation.home.HomeFeedFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home_feed">
+
+        <action
+            android:id="@+id/action_homeFeedFragment_to_createRecipeFragment"
+            app:destination="@id/createRecipeFragment" />
+
+        <action
+            android:id="@+id/action_homeFeedFragment_to_myRecipesFragment"
+            app:destination="@id/myRecipesFragment" />
+
+        <action
+            android:id="@+id/action_homeFeedFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+
+    </fragment>
+
+    <!-- SIGN ACTION -->
+    <fragment
+        android:id="@+id/signUpFragment"
+        android:name="il.co.or.abicook.presentation.auth.SignUpFragment"
+        android:label="Sign Up"
+        tools:layout="@layout/fragment_sign_up">
+
+        <action
+            android:id="@+id/action_signUpFragment_to_homeFeedFragment"
+            app:destination="@id/homeFeedFragment" />
+
+        <action
+            android:id="@+id/action_signUpFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+
+    <!-- CREATE ACTION -->
+    <fragment
+        android:id="@+id/createRecipeFragment"
+        android:name="il.co.or.abicook.presentation.home.CreateRecipeFragment"
+        android:label="Create Recipe"
+        tools:layout="@layout/fragment_create_recipe" >
+        <action
+            android:id="@+id/action_createRecipeFragment_to_homeFeedFragment"
+            app:destination="@id/homeFeedFragment" />
+    </fragment>
+
+    <!-- MY AREA ACTION -->
+    <fragment
+        android:id="@+id/myRecipesFragment"
+        android:name="il.co.or.abicook.presentation.home.MyRecipesFragment"
+        android:label="MyArea"
+        tools:layout="@layout/fragment_my_recipes" >
+        <action
+            android:id="@+id/action_MyRecipesFragment_to_homeFeedFragment"
+            app:destination="@id/homeFeedFragment" />
+        <action
+            android:id="@+id/action_myRecipesFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/recipeDetailsFragment"
+        android:name="il.co.or.abicook.presentation.details.RecipeDetailsFragment"
+        android:label="Recipe Details"
+        tools:layout="@layout/fragment_recipe_details">
+
+        <argument
+            android:name="recipeId"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createRecipeBasicInfoFragment"
+        android:name="il.co.or.abicook.presentation.create.CreateRecipeBasicInfoFragment"
+        android:label="Create Recipe 1"
+        tools:layout="@layout/fragment_create_recipe_basic_info">
+        <action
+            android:id="@+id/action_basicInfo_to_ingredients"
+            app:destination="@id/createRecipeIngredientsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createRecipeIngredientsFragment"
+        android:name="il.co.or.abicook.presentation.create.CreateRecipeIngredientsFragment"
+        android:label="Create Recipe 2"
+        tools:layout="@layout/fragment_create_recipe_ingredients">
+        <action
+            android:id="@+id/action_ingredients_to_steps"
+            app:destination="@id/createRecipeStepsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createRecipeStepsFragment"
+        android:name="il.co.or.abicook.presentation.create.CreateRecipeStepsFragment"
+        android:label="Create Recipe 3"
+        tools:layout="@layout/fragment_create_recipe_steps" />
+
+</navigation>
