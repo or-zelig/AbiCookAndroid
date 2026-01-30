@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootHome"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- ===================== FILTERS PANEL ===================== -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/panelFilters"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:padding="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvGreetingFilters"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="היי 😊 איזה סוג מתכונים בא לך לראות היום?"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingBottom="14dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="בחר קטגוריות:"
+                android:textStyle="bold"
+                android:paddingBottom="8dp" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chipGroupCategories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:singleLine="false"
+                app:chipSpacingHorizontal="8dp"
+                app:chipSpacingVertical="8dp"
+                android:paddingBottom="18dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="איך למיין?"
+                android:textStyle="bold"
+                android:paddingBottom="8dp" />
+
+            <RadioGroup
+                android:id="@+id/rgSort"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="18dp">
+
+                <RadioButton
+                    android:id="@+id/rbNewest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="הכי חדשים" />
+
+                <RadioButton
+                    android:id="@+id/rbMostLiked"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="הכי הרבה לייקים" />
+            </RadioGroup>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="הגבל זמן הכנה כולל"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switchTotalTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <!-- נפתח/נסגר לפי ה-switch -->
+            <LinearLayout
+                android:id="@+id/timeRangeContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:paddingBottom="18dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="6dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="עד:"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvTotalTimeValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="10dp"
+                        android:text="60 דקות"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/sliderTotalTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:valueFrom="10"
+                    android:valueTo="240"
+                    android:stepSize="5"
+                    android:value="60" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnShowRecipes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="SHOW RECIPES" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- ===================== RESULTS PANEL ===================== -->
+    <!-- ===================== RESULTS PANEL ===================== -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/panelResults"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvGreetingResults"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="WELCOME"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:padding="16dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnOpenFilters" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnOpenFilters"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FILTER"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/tvGreetingResults" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvFeed"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:padding="12dp"
+            app:layout_constraintTop_toBottomOf="@+id/tvGreetingResults"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</FrameLayout>
