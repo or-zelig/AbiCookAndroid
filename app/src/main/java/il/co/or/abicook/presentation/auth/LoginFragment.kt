@@ -16,6 +16,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import il.co.or.abicook.R
 import il.co.or.abicook.data.repository.FirebaseAuthRepository
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import il.co.or.abicook.data.remote.themealdb.LoginBackgroundRepository
+import kotlinx.coroutines.launch
 
 class LoginFragment : Fragment() {
 
@@ -36,6 +41,15 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val rvBackground = view.findViewById<RecyclerView>(R.id.rvBackground)
+
+        rvBackground.layoutManager = GridLayoutManager(requireContext(), 3)
+
+        lifecycleScope.launch {
+            val images = LoginBackgroundRepository().loadImages()
+            rvBackground.adapter = LoginBackgroundAdapter(images)
+        }
 
         val etEmail = view.findViewById<TextInputEditText>(R.id.etEmail)
         val etPassword = view.findViewById<TextInputEditText>(R.id.etPassword)
