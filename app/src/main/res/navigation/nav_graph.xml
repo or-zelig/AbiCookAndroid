@@ -5,54 +5,32 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
-    <!-- GLOBAL ACTION -->
-    <action
-        android:id="@+id/action_global_createRecipeFragment"
-        app:destination="@id/createRecipeFragment" />
+    <!-- GLOBAL ACTIONS -->
     <action
         android:id="@+id/action_global_recipeDetailsFragment"
         app:destination="@id/recipeDetailsFragment" />
+
     <action
         android:id="@+id/action_global_createRecipeWizard"
         app:destination="@id/createRecipeBasicInfoFragment" />
 
-
-    <!-- LOGIN ACTION -->
+    <!-- LOGIN -->
     <fragment
         android:id="@+id/loginFragment"
         android:name="il.co.or.abicook.presentation.auth.LoginFragment"
         android:label="Login"
         tools:layout="@layout/fragment_login">
+
         <action
             android:id="@+id/action_loginFragment_to_signUpFragment"
             app:destination="@id/signUpFragment" />
+
         <action
             android:id="@+id/action_loginFragment_to_homeFeedFragment"
             app:destination="@id/homeFeedFragment" />
     </fragment>
 
-    <!-- HOME ACTION -->
-    <fragment
-        android:id="@+id/homeFeedFragment"
-        android:name="il.co.or.abicook.presentation.home.HomeFeedFragment"
-        android:label="Home"
-        tools:layout="@layout/fragment_home_feed">
-
-        <action
-            android:id="@+id/action_homeFeedFragment_to_createRecipeFragment"
-            app:destination="@id/createRecipeFragment" />
-
-        <action
-            android:id="@+id/action_homeFeedFragment_to_myRecipesFragment"
-            app:destination="@id/myRecipesFragment" />
-
-        <action
-            android:id="@+id/action_homeFeedFragment_to_loginFragment"
-            app:destination="@id/loginFragment" />
-
-    </fragment>
-
-    <!-- SIGN ACTION -->
+    <!-- SIGN UP -->
     <fragment
         android:id="@+id/signUpFragment"
         android:name="il.co.or.abicook.presentation.auth.SignUpFragment"
@@ -70,31 +48,44 @@
             app:popUpToInclusive="false" />
     </fragment>
 
-    <!-- CREATE ACTION -->
+    <!-- HOME FEED -->
     <fragment
-        android:id="@+id/createRecipeFragment"
-        android:name="il.co.or.abicook.presentation.home.CreateRecipeFragment"
-        android:label="Create Recipe"
-        tools:layout="@layout/fragment_create_recipe" >
+        android:id="@+id/homeFeedFragment"
+        android:name="il.co.or.abicook.presentation.home.HomeFeedFragment"
+        android:label="Home"
+        tools:layout="@layout/fragment_home_feed">
+
+        <!-- ✅ FIX: instead of createRecipeFragment -> go to wizard step 1 -->
         <action
-            android:id="@+id/action_createRecipeFragment_to_homeFeedFragment"
-            app:destination="@id/homeFeedFragment" />
+            android:id="@+id/action_homeFeedFragment_to_createRecipeWizard"
+            app:destination="@id/createRecipeBasicInfoFragment" />
+
+        <action
+            android:id="@+id/action_homeFeedFragment_to_myRecipesFragment"
+            app:destination="@id/myRecipesFragment" />
+
+        <action
+            android:id="@+id/action_homeFeedFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
     </fragment>
 
-    <!-- MY AREA ACTION -->
+    <!-- MY RECIPES -->
     <fragment
         android:id="@+id/myRecipesFragment"
         android:name="il.co.or.abicook.presentation.home.MyRecipesFragment"
         android:label="MyArea"
-        tools:layout="@layout/fragment_my_recipes" >
+        tools:layout="@layout/fragment_my_recipes">
+
         <action
             android:id="@+id/action_MyRecipesFragment_to_homeFeedFragment"
             app:destination="@id/homeFeedFragment" />
+
         <action
             android:id="@+id/action_myRecipesFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
     </fragment>
 
+    <!-- RECIPE DETAILS -->
     <fragment
         android:id="@+id/recipeDetailsFragment"
         android:name="il.co.or.abicook.presentation.details.RecipeDetailsFragment"
@@ -104,28 +95,46 @@
         <argument
             android:name="recipeId"
             app:argType="string" />
+
+        <!-- ✅ NEW: show edit only when came from MyRecipes -->
+        <argument
+            android:name="fromMyFeed"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
 
+    <!-- CREATE WIZARD STEP 1 -->
     <fragment
         android:id="@+id/createRecipeBasicInfoFragment"
         android:name="il.co.or.abicook.presentation.create.CreateRecipeBasicInfoFragment"
         android:label="Create Recipe 1"
         tools:layout="@layout/fragment_create_recipe_basic_info">
+
+        <!-- ✅ NEW: edit mode -->
+        <argument
+            android:name="editRecipeId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+
         <action
             android:id="@+id/action_basicInfo_to_ingredients"
             app:destination="@id/createRecipeIngredientsFragment" />
     </fragment>
 
+    <!-- CREATE WIZARD STEP 2 -->
     <fragment
         android:id="@+id/createRecipeIngredientsFragment"
         android:name="il.co.or.abicook.presentation.create.CreateRecipeIngredientsFragment"
         android:label="Create Recipe 2"
         tools:layout="@layout/fragment_create_recipe_ingredients">
+
         <action
             android:id="@+id/action_ingredients_to_steps"
             app:destination="@id/createRecipeStepsFragment" />
     </fragment>
 
+    <!-- CREATE WIZARD STEP 3 -->
     <fragment
         android:id="@+id/createRecipeStepsFragment"
         android:name="il.co.or.abicook.presentation.create.CreateRecipeStepsFragment"

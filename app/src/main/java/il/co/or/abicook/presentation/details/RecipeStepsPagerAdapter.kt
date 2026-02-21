@@ -39,12 +39,20 @@ class RecipeStepsPagerAdapter : RecyclerView.Adapter<RecipeStepsPagerAdapter.VH>
         fun bind(step: RecipeStep, index: Int) {
             tv.text = "${index + 1}. ${step.text.ifBlank { "(step)" }}"
 
-            val url = step.imageUrl
-            Glide.with(iv)
-                .load(url)
-                .placeholder(R.drawable.ic_launcher_background) // ✅ דיפולטית
-                .error(R.drawable.ic_launcher_background)
-                .into(iv)
+            val url = step.imageUrl?.trim()
+
+            if (url.isNullOrBlank()) {
+                // ✅ אין תמונה לשלב -> להסתיר לגמרי ולא להשאיר ריבוע
+                iv.visibility = View.GONE
+                Glide.with(iv).clear(iv)
+            } else {
+                iv.visibility = View.VISIBLE
+                Glide.with(iv)
+                    .load(url)
+                    .placeholder(R.drawable.ic_launcher_background)
+                    .error(R.drawable.ic_launcher_background)
+                    .into(iv)
+            }
         }
     }
 }

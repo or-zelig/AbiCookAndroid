@@ -13,4 +13,11 @@ class FirestoreRecipeDataRepository(
         require(post.id.isNotBlank()) { "RecipePost.id is blank" }
         recipesCol.document(post.id).set(post).await()
     }
+
+    suspend fun getRecipeById(recipeId: String): RecipePost {
+        val doc = recipesCol.document(recipeId).get().await()
+        val obj = doc.toObject(RecipePost::class.java)
+            ?: throw IllegalStateException("Recipe not found")
+        return obj.copy(id = doc.id)
+    }
 }
