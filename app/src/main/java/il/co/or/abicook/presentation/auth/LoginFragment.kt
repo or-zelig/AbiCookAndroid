@@ -1,6 +1,7 @@
 package il.co.or.abicook.presentation.auth
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,12 +44,19 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val rvBackground = view.findViewById<RecyclerView>(R.id.rvBackground)
-
         rvBackground.layoutManager = GridLayoutManager(requireContext(), 3)
 
         lifecycleScope.launch {
-            val images = LoginBackgroundRepository().loadImages()
-            rvBackground.adapter = LoginBackgroundAdapter(images)
+            try {
+                val images = LoginBackgroundRepository().loadImages()
+                if (images.isNotEmpty()) {
+                    rvBackground.adapter = LoginBackgroundAdapter(images)
+                } else {
+                    Log.w("LOGIN_BG", "No images loaded (timeout/offline).")
+                }
+            } catch (e: Exception) {
+                Log.e("LOGIN_BG", "Failed to load images", e)
+            }
         }
 
         val etEmail = view.findViewById<TextInputEditText>(R.id.etEmail)
