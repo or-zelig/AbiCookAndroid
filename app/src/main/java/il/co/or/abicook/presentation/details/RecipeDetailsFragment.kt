@@ -1,6 +1,7 @@
 package il.co.or.abicook.presentation.details
 
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -10,15 +11,16 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.firebase.auth.FirebaseAuth
 import il.co.or.abicook.R
 import il.co.or.abicook.data.repository.FirestoreRecipeDetailsRepository
 import il.co.or.abicook.domain.model.RecipePost
-import androidx.viewpager2.widget.ViewPager2
 
 class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
 
@@ -26,16 +28,14 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
         RecipeDetailsViewModelFactory(FirestoreRecipeDetailsRepository())
     }
 
-    // ✅ moved to fragment scope
-    private lateinit var rvSteps: RecyclerView;
-    private val stepsAdapter = RecipeStepsAdapter();
+    private lateinit var rvSteps: RecyclerView
+    private val stepsAdapter = RecipeStepsAdapter()
 
     private lateinit var stepsPagerContainer: View
     private lateinit var vpSteps: ViewPager2
     private lateinit var btnPrev: MaterialButton
     private lateinit var btnNext: MaterialButton
     private val pagerAdapter = RecipeStepsPagerAdapter()
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -47,8 +47,25 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
                 return
             }
 
+        val fromMyFeed = requireArguments().getBoolean("fromMyFeed", false)
+
         val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+
+        // ✅ EDIT button created in code (no menu xml, no icon)
+        toolbar.menu.clear()
+        val editItem: MenuItem = toolbar.menu.add("EDIT").apply {
+            setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS) // תמיד נראה על ה-toolbar
+            isVisible = false
+        }
+
+        toolbar.setOnMenuItemClickListener { item ->
+            if (item == editItem) {
+                val bundle = androidx.core.os.bundleOf("editRecipeId" to recipeId)
+                findNavController().navigate(R.id.action_global_createRecipeWizard, bundle)
+                true
+            } else false
+        }
 
         val ivRecipe = view.findViewById<ImageView>(R.id.ivRecipe)
         val tvTitle = view.findViewById<TextView>(R.id.tvTitle)
@@ -59,6 +76,7 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
         val tvDescription = view.findViewById<TextView>(R.id.tvDescription)
         val tvIngredientsValue = view.findViewById<TextView>(R.id.tvIngredientsValue)
         val tvStepsValue = view.findViewById<TextView>(R.id.tvStepsValue)
+
         vpSteps = view.findViewById(R.id.vpSteps)
         btnPrev = view.findViewById(R.id.btnPrevStep)
         btnNext = view.findViewById(R.id.btnNextStep)
@@ -67,18 +85,18 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
         vpSteps.adapter = pagerAdapter
         vpSteps.isUserInputEnabled = false
 
-
-        // ✅ use fragment property
         rvSteps = view.findViewById(R.id.rvSteps)
         rvSteps.layoutManager = LinearLayoutManager(requireContext())
         rvSteps.isNestedScrollingEnabled = false
         rvSteps.adapter = stepsAdapter
 
         btnLike.setOnClickListener { vm.toggleLike() }
+
         btnPrev.setOnClickListener {
             val i = vpSteps.currentItem
             if (i > 0) vpSteps.currentItem = i - 1
         }
+
         btnNext.setOnClickListener {
             val i = vpSteps.currentItem
             val total = pagerAdapter.getCount()
@@ -91,10 +109,13 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
             }
         })
 
-
         vm.state.observe(viewLifecycleOwner) { s ->
             s.error?.let { Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show() }
             val r = s.recipe ?: return@observe
+
+            // ✅ show EDIT only if came from MyRecipes AND recipe is mine
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+            editItem.isVisible = fromMyFeed && uid != null && r.authorId == uid
 
             bindRecipe(
                 r = r,
@@ -122,7 +143,6 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
         btnPrev.visibility = if (index == 0) View.INVISIBLE else View.VISIBLE
         btnNext.visibility = if (index == total - 1) View.INVISIBLE else View.VISIBLE
     }
-
 
     private fun bindRecipe(
         r: RecipePost,
@@ -159,11 +179,17 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
         tvDescription.text = r.description
         tvIngredientsValue.text = r.ingredientsSummary
 
-        Glide.with(ivRecipe)
-            .load(r.imageUrl)
-            .placeholder(R.drawable.ic_launcher_background)
-            .error(R.drawable.ic_launcher_background)
-            .into(ivRecipe)
+        val coverUrl = r.imageUrl?.trim()
+        if (coverUrl.isNullOrBlank()) {
+            Glide.with(ivRecipe).clear(ivRecipe)
+            ivRecipe.setImageResource(R.drawable.ic_launcher_background)
+        } else {
+            Glide.with(ivRecipe)
+                .load(coverUrl)
+                .placeholder(R.drawable.ic_launcher_background)
+                .error(R.drawable.ic_launcher_background)
+                .into(ivRecipe)
+        }
 
         if (r.steps.isNotEmpty()) {
             tvStepsValue.visibility = View.GONE
@@ -177,6 +203,5 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
             tvStepsValue.visibility = View.VISIBLE
             tvStepsValue.text = r.stepsSummary
         }
-
     }
 }
