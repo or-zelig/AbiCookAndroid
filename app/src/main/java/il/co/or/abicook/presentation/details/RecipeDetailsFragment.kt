@@ -15,6 +15,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.google.firebase.auth.FirebaseAuth
 import il.co.or.abicook.R
 import il.co.or.abicook.data.repository.FirestoreRecipeDetailsRepository
 import il.co.or.abicook.domain.model.RecipePost
@@ -26,16 +27,14 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
         RecipeDetailsViewModelFactory(FirestoreRecipeDetailsRepository())
     }
 
-    // ✅ moved to fragment scope
-    private lateinit var rvSteps: RecyclerView;
-    private val stepsAdapter = RecipeStepsAdapter();
+    private lateinit var rvSteps: RecyclerView
+    private val stepsAdapter = RecipeStepsAdapter()
 
     private lateinit var stepsPagerContainer: View
     private lateinit var vpSteps: ViewPager2
     private lateinit var btnPrev: MaterialButton
     private lateinit var btnNext: MaterialButton
     private val pagerAdapter = RecipeStepsPagerAdapter()
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -47,8 +46,26 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
                 return
             }
 
+        val fromMyFeed = requireArguments().getBoolean("fromMyFeed", false)
+
         val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+
+        // ✅ Edit menu
+        toolbar.inflateMenu(R.menu.menu_recipe_details)
+        val editItem = toolbar.menu.findItem(R.id.action_edit)
+        editItem.isVisible = false
+
+        toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_edit -> {
+                    val bundle = androidx.core.os.bundleOf("editRecipeId" to recipeId)
+                    findNavController().navigate(R.id.action_global_createRecipeWizard, bundle)
+                    true
+                }
+                else -> false
+            }
+        }
 
         val ivRecipe = view.findViewById<ImageView>(R.id.ivRecipe)
         val tvTitle = view.findViewById<TextView>(R.id.tvTitle)
@@ -67,8 +84,6 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
         vpSteps.adapter = pagerAdapter
         vpSteps.isUserInputEnabled = false
 
-
-        // ✅ use fragment property
         rvSteps = view.findViewById(R.id.rvSteps)
         rvSteps.layoutManager = LinearLayoutManager(requireContext())
         rvSteps.isNestedScrollingEnabled = false
@@ -91,10 +106,12 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
             }
         })
 
-
         vm.state.observe(viewLifecycleOwner) { s ->
             s.error?.let { Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show() }
             val r = s.recipe ?: return@observe
+
+            val uid = FirebaseAuth.getInstance().currentUser?.uid
+            editItem.isVisible = fromMyFeed && uid != null && r.authorId == uid
 
             bindRecipe(
                 r = r,
@@ -122,7 +139,6 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
         btnPrev.visibility = if (index == 0) View.INVISIBLE else View.VISIBLE
         btnNext.visibility = if (index == total - 1) View.INVISIBLE else View.VISIBLE
     }
-
 
     private fun bindRecipe(
         r: RecipePost,
@@ -177,6 +193,5 @@ class RecipeDetailsFragment : Fragment(R.layout.fragment_recipe_details) {
             tvStepsValue.visibility = View.VISIBLE
             tvStepsValue.text = r.stepsSummary
         }
-
     }
 }

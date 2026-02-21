@@ -16,7 +16,6 @@
         android:id="@+id/action_global_createRecipeWizard"
         app:destination="@id/createRecipeBasicInfoFragment" />
 
-
     <!-- LOGIN ACTION -->
     <fragment
         android:id="@+id/loginFragment"
@@ -49,7 +48,6 @@
         <action
             android:id="@+id/action_homeFeedFragment_to_loginFragment"
             app:destination="@id/loginFragment" />
-
     </fragment>
 
     <!-- SIGN ACTION -->
@@ -104,6 +102,12 @@
         <argument
             android:name="recipeId"
             app:argType="string" />
+
+        <!-- ✅ NEW -->
+        <argument
+            android:name="fromMyFeed"
+            app:argType="boolean"
+            android:defaultValue="false" />
     </fragment>
 
     <fragment
@@ -111,6 +115,14 @@
         android:name="il.co.or.abicook.presentation.create.CreateRecipeBasicInfoFragment"
         android:label="Create Recipe 1"
         tools:layout="@layout/fragment_create_recipe_basic_info">
+
+        <!-- ✅ NEW -->
+        <argument
+            android:name="editRecipeId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+
         <action
             android:id="@+id/action_basicInfo_to_ingredients"
             app:destination="@id/createRecipeIngredientsFragment" />

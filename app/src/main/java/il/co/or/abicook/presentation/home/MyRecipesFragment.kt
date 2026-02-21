@@ -24,7 +24,6 @@ import kotlinx.coroutines.tasks.await
 
 class MyRecipesFragment : Fragment(R.layout.fragment_my_recipes) {
 
-    // ✅ חשוב: Activity scope כדי שנוכל לאפס בלוגאאוט מתוך MainActivity
     private val vm: MyRecipesViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -57,7 +56,10 @@ class MyRecipesFragment : Fragment(R.layout.fragment_my_recipes) {
         }
 
         val adapter = RecipePostAdapter { post ->
-            val bundle = androidx.core.os.bundleOf("recipeId" to post.id)
+            val bundle = androidx.core.os.bundleOf(
+                "recipeId" to post.id,
+                "fromMyFeed" to true // ✅ NEW
+            )
             findNavController().navigate(R.id.action_global_recipeDetailsFragment, bundle)
         }
         rv.layoutManager = LinearLayoutManager(requireContext())
@@ -68,9 +70,8 @@ class MyRecipesFragment : Fragment(R.layout.fragment_my_recipes) {
                 progress.isVisible = s.isLoading || s.isRefreshing
 
                 if (s.notLoggedIn) {
-                    // ✅ ניקוי UI פילטרים אם נשארו מה-ViewState
                     chipGroup.clearCheck()
-                    rgSort.check(R.id.rbNewest) // ודא שיש rbNewest אצלך ב-layout
+                    rgSort.check(R.id.rbNewest)
                 }
 
                 when {

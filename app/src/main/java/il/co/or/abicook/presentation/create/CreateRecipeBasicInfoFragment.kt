@@ -18,7 +18,6 @@ import il.co.or.abicook.R
 
 class CreateRecipeBasicInfoFragment : Fragment(R.layout.fragment_create_recipe_basic_info) {
 
-    // חשוב: activityViewModels כדי שהדראפט ישמר בין 3 המסכים
     private val vm: CreateRecipeWizardViewModel by activityViewModels()
 
     private val pickCover = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -32,6 +31,14 @@ class CreateRecipeBasicInfoFragment : Fragment(R.layout.fragment_create_recipe_b
         val toolbar = view.findViewById<MaterialToolbar>(R.id.toolbar)
         toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
 
+        val editRecipeId = arguments?.getString("editRecipeId")
+
+        // ✅ prevent re-trigger on rotation
+        if (savedInstanceState == null) {
+            if (!editRecipeId.isNullOrBlank()) vm.startEdit(editRecipeId)
+            else vm.ensureFreshForNew()
+        }
+
         val etTitle = view.findViewById<TextInputEditText>(R.id.etTitle)
         val etDescription = view.findViewById<TextInputEditText>(R.id.etDescription)
         val etPrep = view.findViewById<TextInputEditText>(R.id.etPrepTime)
@@ -42,7 +49,6 @@ class CreateRecipeBasicInfoFragment : Fragment(R.layout.fragment_create_recipe_b
         val btnPickCover = view.findViewById<MaterialButton>(R.id.btnPickCover)
         val btnNext = view.findViewById<MaterialButton>(R.id.btnNext)
 
-        // Build chips
         chipGroup.removeAllViews()
         val categories = resources.getStringArray(R.array.recipe_categories)
         for (label in categories) {
@@ -60,13 +66,11 @@ class CreateRecipeBasicInfoFragment : Fragment(R.layout.fragment_create_recipe_b
         etPrep.setText(d.prepTimeMin.toString())
         etCook.setText(d.cookTimeMin.toString())
 
-        // Restore selected categories
         for (i in 0 until chipGroup.childCount) {
             val c = chipGroup.getChildAt(i) as? Chip ?: continue
             c.isChecked = d.categories.contains(c.text.toString())
         }
 
-        // Restore cover
         d.coverUri?.let { uriStr ->
             ivCover.setImageURI(Uri.parse(uriStr))
         }
@@ -74,7 +78,6 @@ class CreateRecipeBasicInfoFragment : Fragment(R.layout.fragment_create_recipe_b
         btnPickCover.setOnClickListener { pickCover.launch("image/*") }
 
         btnNext.setOnClickListener {
-            // Collect selected categories (בלי children extension)
             val selected = mutableSetOf<String>()
             for (i in 0 until chipGroup.childCount) {
                 val c = chipGroup.getChildAt(i) as? Chip ?: continue
